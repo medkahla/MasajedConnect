@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, X } from "lucide-react";
+import { Pencil, Plus, Trash2, X } from "lucide-react";
 
 const NEED_CATEGORIES: NeedCategory[] = [
   "ELECTRICIAN",
@@ -28,6 +28,7 @@ export default function NeedsPage() {
   const [needs, setNeeds] = useState<Need[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editingNeed, setEditingNeed] = useState<Need | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -51,16 +52,7 @@ export default function NeedsPage() {
     setLoading(false);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!mosqueId) return;
-
-    await service.createNeed({
-      ...formData,
-      mosqueId,
-      status: "OPEN",
-    });
-
+  const resetForm = () => {
     setFormData({
       title: "",
       description: "",
@@ -68,7 +60,38 @@ export default function NeedsPage() {
       contactEmail: "",
     });
     setShowForm(false);
+    setEditingNeed(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mosqueId) return;
+
+    if (editingNeed) {
+      // Mode édition
+      await service.updateNeed(editingNeed.id, formData);
+    } else {
+      // Mode création
+      await service.createNeed({
+        ...formData,
+        mosqueId,
+        status: "OPEN",
+      });
+    }
+
+    resetForm();
     loadNeeds();
+  };
+
+  const handleEdit = (need: Need) => {
+    setEditingNeed(need);
+    setFormData({
+      title: need.title,
+      description: need.description,
+      category: need.category,
+      contactEmail: need.contactEmail || "",
+    });
+    setShowForm(true);
   };
 
   const handleStatusChange = async (id: string, status: NeedStatus) => {
@@ -116,8 +139,8 @@ export default function NeedsPage() {
       {showForm && (
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>{t("need.add")}</CardTitle>
-            <Button variant="ghost" size="icon" onClick={() => setShowForm(false)}>
+            <CardTitle>{editingNeed ? t("need.edit") : t("need.add")}</CardTitle>
+            <Button variant="ghost" size="icon" onClick={resetForm}>
               <X className="w-4 h-4" />
             </Button>
           </CardHeader>
@@ -187,7 +210,7 @@ export default function NeedsPage() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => setShowForm(false)}
+                  onClick={resetForm}
                 >
                   {t("dash.cancel")}
                 </Button>
@@ -246,14 +269,24 @@ export default function NeedsPage() {
                         {t("need.mark_resolved")}
                       </Button>
                     )}
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      onClick={() => handleDelete(need.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                        onClick={() => handleEdit(need)}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => handleDelete(need.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </CardContent>

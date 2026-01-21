@@ -13,6 +13,7 @@ import {
   LogOut,
   Wrench,
   Calendar,
+  Globe,
 } from "lucide-react";
 
 export default function DashboardLayout({
@@ -21,7 +22,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const { user, setUser } = useService();
-  const { t, direction } = useLanguage();
+  const { t, direction, language, setLanguage } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -69,7 +70,38 @@ export default function DashboardLayout({
           })}
         </nav>
 
-        <div className="p-4 border-t">
+        <div className="p-4 border-t space-y-3">
+          {/* Language Selector */}
+          <div className="flex items-center gap-2 justify-center">
+            <Globe className="w-4 h-4 text-gray-500" />
+            <div className="flex gap-1">
+              <Button
+                size="sm"
+                variant={language === "ar" ? "default" : "outline"}
+                className="px-2 py-1 text-xs"
+                onClick={() => setLanguage("ar")}
+              >
+                عربي
+              </Button>
+              <Button
+                size="sm"
+                variant={language === "fr" ? "default" : "outline"}
+                className="px-2 py-1 text-xs"
+                onClick={() => setLanguage("fr")}
+              >
+                FR
+              </Button>
+              <Button
+                size="sm"
+                variant={language === "en" ? "default" : "outline"}
+                className="px-2 py-1 text-xs"
+                onClick={() => setLanguage("en")}
+              >
+                EN
+              </Button>
+            </div>
+          </div>
+
           <Button
             variant="outline"
             className="w-full gap-2"

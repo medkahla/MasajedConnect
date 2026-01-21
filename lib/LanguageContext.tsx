@@ -157,7 +157,7 @@ const translations: Translations = {
     en: "Contact Email",
   },
   "need.add": { ar: "إضافة حاجة", fr: "Ajouter un besoin", en: "Add Need" },
-  "need.edit": { ar: "تعديل", fr: "Modifier", en: "Edit" },
+  "need.edit": { ar: "تعديل الحاجة", fr: "Modifier le besoin", en: "Edit Need" },
   "need.delete": { ar: "حذف", fr: "Supprimer", en: "Delete" },
   "need.mark_resolved": {
     ar: "تم الحل",
